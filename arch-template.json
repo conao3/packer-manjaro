@@ -21,7 +21,7 @@
                 "<enter><wait10><wait10><wait10><wait10>",
                 "/usr/bin/curl -O http://{{ .HTTPIP }}:{{ .HTTPPort }}/enable-ssh.sh<enter><wait5>",
                 "/usr/bin/curl -O http://{{ .HTTPIP }}:{{ .HTTPPort }}/poweroff.timer<enter><wait5>",
-                "/usr/bin/bash ./enable-ssh.sh<enter>"
+                "/usr/bin/bash ./enable-ssh.sh<enter><wait5>"
             ],
             "cpus": 1,
             "memory": 768,
@@ -43,7 +43,7 @@
                 "<enter><wait10><wait10><wait10><wait10>",
                 "/usr/bin/curl -O http://{{ .HTTPIP }}:{{ .HTTPPort }}/enable-ssh.sh<enter><wait5>",
                 "/usr/bin/curl -O http://{{ .HTTPIP }}:{{ .HTTPPort }}/poweroff.timer<enter><wait5>",
-                "/usr/bin/bash ./enable-ssh.sh<enter>"
+                "/usr/bin/bash ./enable-ssh.sh<enter><wait5>"
             ],
             "cpus": 1,
             "memory": 768,
@@ -65,7 +65,7 @@
                 "<enter><wait10><wait10><wait10><wait10>",
                 "/usr/bin/curl -O http://{{ .HTTPIP }}:{{ .HTTPPort }}/enable-ssh.sh<enter><wait5>",
                 "/usr/bin/curl -O http://{{ .HTTPIP }}:{{ .HTTPPort }}/poweroff.timer<enter><wait5>",
-                "/usr/bin/bash ./enable-ssh.sh<enter>"
+                "/usr/bin/bash ./enable-ssh.sh<enter><wait5>"
             ],
             "cpus": 1,
             "memory": 768,
@@ -86,7 +86,7 @@
                 "<enter><wait10><wait10><wait10><wait10>",
                 "/usr/bin/curl -O http://{{ .HTTPIP }}:{{ .HTTPPort }}/enable-ssh.sh<enter><wait5>",
                 "/usr/bin/curl -O http://{{ .HTTPIP }}:{{ .HTTPPort }}/poweroff.timer<enter><wait5>",
-                "/usr/bin/bash ./enable-ssh.sh<enter>"
+                "/usr/bin/bash ./enable-ssh.sh<enter><wait5>"
             ],
             "cpus": 1,
             "memory": 768,
