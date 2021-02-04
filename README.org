@@ -1,4 +1,53 @@
-* Packer Arch
+#+author: conao3
+#+date: <2020-03-20 Fri>
+
+[[https://github.com/conao3/packer-manjaro][https://raw.githubusercontent.com/conao3/files/master/blob/headers/png/packer-manjaro.png]]
+[[https://github.com/conao3/packer-manjaro/blob/master/LICENSE][https://img.shields.io/github/license/conao3/packer-manjaro.svg?style=flat-square]]
+[[https://github.com/conao3/packer-manjaro/releases][https://img.shields.io/github/tag/conao3/packer-manjaro.svg?style=flat-square]]
+[[https://github.com/conao3/packer-manjaro/actions][https://img.shields.io/badge/patreon-become%20a%20patron-orange.svg?logo=patreon&style=flat-square]]
+[[https://twitter.com/conao_3][https://img.shields.io/badge/twitter-@conao__3-blue.svg?logo=twitter&style=flat-square]]
+[[https://conao3-support.slack.com/join/shared_invite/enQtNjUzMDMxODcyMjE1LWUwMjhiNTU3Yjk3ODIwNzAxMTgwOTkxNmJiN2M4OTZkMWY0NjI4ZTg4MTVlNzcwNDY2ZjVjYmRiZmJjZDU4MDE][https://img.shields.io/badge/chat-on_slack-blue.svg?logo=slack&style=flat-square]]
+
+* Description
+Packer template for [[https://archlinux.org/][Arch Linux]] and [[https://manjaro.org/][Manjaro Linux]].
+
+This project is forked from [[https://github.com/elasticdog/packer-arch][packer-arch]] and added Manjaro Linux support.
+
+* Usage
+#+begin_src sh
+cd packer-manjaro
+packer build -only=virtualbox-iso manjaro-template.json
+
+OUTPUT_VERSION=2021.02.01
+VERSION=20210201
+vagrant box add archlinux-$VERSION output/packer_arch_virtualbox-$OUTPUT_VERSION.box
+
+cd ../
+# vagrant init archlinux-$VERSION
+vagrant up
+
+# Now you can use vagranted Archlinux!
+vagrant ssh-config >> ~/.ssh/config
+ssh default
+#+end_src
+
+* Development
+** Requirements
+- [[https://www.vagrantup.com/][vagrant]] - 2.2.14
+  - [[https://www.virtualbox.org/][virtualbox]] - 6.1.16
+- [[https://www.packer.io/][packer]] - 1.6.5
+
+*** Quick install
+#+begin_src sh
+# vagrant, packer
+yay -S linux-headers
+yay -S virtualbox-host-dkms
+yay -S virtualbox
+yay -S vagrant packer
+#+end_src
+
+* Packer Arch - from [[https://github.com/elasticdog/packer-arch][packer-arch]] project page
+
 Packer Arch is a bare bones [[https://www.packer.io/][Packer]] template and installation
 script that can be used to generate a [[https://www.vagrantup.com/][Vagrant]] base box for [[https://www.archlinux.org/][Arch
 Linux]].  The template works with the default VirtualBox provider
@@ -146,4 +195,5 @@ playbooks for configuration management.
 Packer Arch is provided under the terms of the [[https://en.wikipedia.org/wiki/ISC_license][ISC License]].
 
 Copyright © 2013--2017, [[mailto:aaron@elasticdog.com][Aaron Bull Schaefer]].
+
 Copyright © 2021, Naoya Yamashita.
