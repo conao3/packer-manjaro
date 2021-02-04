@@ -146,3 +146,4 @@ playbooks for configuration management.
 Packer Arch is provided under the terms of the [[https://en.wikipedia.org/wiki/ISC_license][ISC License]].
 
 Copyright © 2013--2017, [[mailto:aaron@elasticdog.com][Aaron Bull Schaefer]].
+Copyright © 2021, Naoya Yamashita.
