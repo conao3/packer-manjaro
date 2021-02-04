@@ -1,0 +1,148 @@
+* Packer Arch
+Packer Arch is a bare bones [[https://www.packer.io/][Packer]] template and installation
+script that can be used to generate a [[https://www.vagrantup.com/][Vagrant]] base box for [[https://www.archlinux.org/][Arch
+Linux]].  The template works with the default VirtualBox provider
+as well as with [[https://www.vagrantup.com/vmware][VMware]], [[https://github.com/Parallels/vagrant-parallels][Parallels]] and [[https://github.com/vagrant-libvirt/vagrant-libvirt][libvirt]] providers.
+
+** Overview
+My goal was to roughly duplicate the attributes from a
+[[https://www.digitalocean.com/][DigitalOcean]] Arch Linux droplet:
+
+- 64-bit
+- 20 GB disk
+- 512 MB memory
+- Only a single /root partition (ext4)
+- No swap
+- Includes the =base= meta package and =base-devel= group
+- OpenSSH is also installed and enabled on boot
+
+The installation script follows the [[https://wiki.archlinux.org/index.php/Installation_Guide][official installation guide]]
+pretty closely, with a few tweaks to ensure functionality within
+a VM.  Beyond that, the only customizations to the machine are
+related to the vagrant user and the steps recommended for any
+base box.
+
+** Usage
+*** VirtualBox Provider
+Assuming that you already have Packer, [[https://www.virtualbox.org/][VirtualBox]], and Vagrant
+installed, you should be good to clone this repo and go:
+
+#+begin_example
+  $ git clone https://github.com/elasticdog/packer-arch.git
+  $ cd packer-arch/
+  $ packer build -only=virtualbox-iso arch-template.json
+#+end_example
+
+Then you can import the generated box into Vagrant:
+
+#+begin_example
+  $ vagrant box add arch output/packer_arch_virtualbox.box
+#+end_example
+
+*** VMware Provider
+Assuming that you already have Packer, [[https://www.vmware.com/products/fusion/][VMware Fusion]] (or [[https://www.vmware.com/products/workstation/][VMware
+Workstation]]), and Vagrant with the VMware provider installed, you
+should be good to clone this repo and go:
+
+#+begin_example
+  $ git clone https://github.com/elasticdog/packer-arch.git
+  $ cd packer-arch/
+  $ packer build -only=vmware-iso arch-template.json
+#+end_example
+
+Then you can import the generated box into Vagrant:
+
+#+begin_example
+  $ vagrant box add arch output/packer_arch_vmware.box
+#+end_example
+
+*** Parallels Provider
+Assuming that you already have Packer, [[http://www.parallels.com/][Parallels]], [[http://www.parallels.com/eu/products/desktop/download/][Parallels SDK]]
+and Vagrant with the Parallels provider installed, you should be
+good to clone this repo and go:
+
+#+begin_example
+  $ git clone https://github.com/elasticdog/packer-arch.git
+  $ cd packer-arch/
+  $ packer build -only=parallels-iso arch-template.json
+#+end_example
+
+Then you can import the generated box into Vagrant:
+
+#+begin_example
+  $ vagrant box add arch output/packer_arch_parallels.box
+#+end_example
+
+*** libvirt Provider
+Assuming that you already have Packer, Vagrant with the
+[[https://github.com/vagrant-libvirt/vagrant-libvirt][vagrant-libvirt]]
+plugin installed, you should be good to clone this repo and go:
+
+#+begin_example
+  $ git clone https://github.com/elasticdog/packer-arch.git
+  $ cd packer-arch/
+  $ packer build -only=qemu arch-template.json
+#+end_example
+
+Then you can import the generated box into Vagrant:
+
+#+begin_example
+  $ vagrant box add arch output/packer_arch_libvirt.box
+#+end_example
+
+NOTE: libvirt support is limited to QEMU/KVM only.
+
+*** wrapacker
+For convenience, there is a wrapper script named =wrapacker= that
+will run the appropriate =packer build= command for you that will
+also automatically ensure the latest ISO download URL and
+optionally use a mirror from a provided country code in order to
+build the final box.
+
+#+begin_example
+  $ wrapacker --country US --dry-run
+#+end_example
+
+For debugging purposes, execute:
+
+#+begin_example
+  $ PACKER_LOG=1 ./wrapacker --country=US --provider=virtualbox --on-error=ask --force
+#+end_example
+
+See the =--help= flag for additional details.
+
+** Known Issues
+*** VMware Tools
+The official VMware Tools do not currently support Arch Linux,
+and the [[https://github.com/vmware/open-vm-tools][Open Virtual Machine Tools]] (open-vm-tools) require
+extensive patching in order to compile correctly with a Linux
+3.11 series kernel.  So for the time being, I have not included
+support for the tools.
+
+No tools means that the shared folder feature will not work, and
+when you run =vagrant up= to launch a VM based on the VMware box,
+you will see the following error message:
+
+#+begin_quote
+  The HGFS kernel module was not found on the running virtual
+  machine.  This must be installed for shared folders to work
+  properly.  Please install the VMware tools within the guest and
+  try again.  Note that the VMware tools installation will
+  succeed even if HGFS fails to properly install.  Carefully read
+  the output of the VMware tools installation to verify the HGFS
+  kernel modules were installed properly.
+#+end_quote
+
+Note that /this issue does not apply to VirtualBox/, as their
+official guest additions work just fine.
+
+*** Vagrant Provisioners
+The box purposefully does not include Puppet, Chef or Ansible for
+automatic Vagrant provisioning.  My intention was to duplicate a
+DigitalOcean VPS and furthermore use the VM for testing [[http://www.ansible.com/][Ansible]]
+playbooks for configuration management.
+
+** License
+Packer Arch is provided under the terms of the [[https://en.wikipedia.org/wiki/ISC_license][ISC License]].
+
+Copyright © 2013--2017, [[mailto:aaron@elasticdog.com][Aaron Bull Schaefer]].
