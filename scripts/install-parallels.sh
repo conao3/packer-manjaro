@@ -1,5 +1,7 @@
 #!/usr/bin/bash -x
 
+set -eux
+
 # Parallels Tools
 # https://wiki.archlinux.org/index.php/Parallels
 echo ">>>> install-virtualbox.sh: Installing Parallels Tools.."

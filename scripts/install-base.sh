@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
-# stop on errors
-set -eu
+set -eux
 
 if [[ $PACKER_BUILDER_TYPE == "qemu" ]]; then
   DISK='/dev/vda'

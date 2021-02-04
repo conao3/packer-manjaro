@@ -1,5 +1,7 @@
 #!/usr/bin/bash -x
 
+set -eux
+
 # Clean the pacman cache.
 echo ">>>> cleanup.sh: Cleaning pacman cache.."
 /usr/bin/pacman -Scc --noconfirm

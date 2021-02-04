@@ -1,5 +1,7 @@
 #!/usr/bin/bash -x
 
+set -eux
+
 # Open VM Tools
 # https://wiki.archlinux.org/index.php/VMware
 # https://wiki.archlinux.org/index.php/VMware/Installing_Arch_as_a_guest
