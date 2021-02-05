@@ -43,20 +43,20 @@ echo ">>>> install-base.sh: Setting pacman ${COUNTRY} mirrors.."
 curl -s "$MIRRORLIST" |  sed 's/^#Server/Server/' > /etc/pacman.d/mirrorlist
 
 echo ">>>> install-base.sh: Bootstrapping the base installation.."
-/usr/bin/pacstrap ${TARGET_DIR} base base-devel linux
+/usr/bin/basestrap ${TARGET_DIR} base base-devel linux
 
 # Need to install netctl as well: https://github.com/archlinux/arch-boxes/issues/70
 # Can be removed when Vagrant's Arch plugin will use systemd-networkd: https://github.com/hashicorp/vagrant/pull/11400
 echo ">>>> install-base.sh: Installing basic packages.."
-/usr/bin/arch-chroot ${TARGET_DIR} pacman -S --noconfirm gptfdisk openssh syslinux dhcpcd netctl
+/usr/bin/manjaro-chroot ${TARGET_DIR} pacman -S --noconfirm gptfdisk openssh syslinux dhcpcd netctl
 
 echo ">>>> install-base.sh: Configuring syslinux.."
-/usr/bin/arch-chroot ${TARGET_DIR} syslinux-install_update -i -a -m
+/usr/bin/manjaro-chroot ${TARGET_DIR} syslinux-install_update -i -a -m
 /usr/bin/sed -i "s|sda3|${ROOT_PARTITION##/dev/}|" "${TARGET_DIR}/boot/syslinux/syslinux.cfg"
 /usr/bin/sed -i 's/TIMEOUT 50/TIMEOUT 10/' "${TARGET_DIR}/boot/syslinux/syslinux.cfg"
 
 echo ">>>> install-base.sh: Generating the filesystem table.."
-/usr/bin/genfstab -p ${TARGET_DIR} >> "${TARGET_DIR}/etc/fstab"
+/usr/bin/fstabgen -p ${TARGET_DIR} >> "${TARGET_DIR}/etc/fstab"
 
 echo ">>>> install-base.sh: Generating the system configuration script.."
 /usr/bin/install --mode=0755 /dev/null "${TARGET_DIR}${CONFIG_SCRIPT}"
@@ -106,7 +106,7 @@ cat <<-EOF > "${TARGET_DIR}${CONFIG_SCRIPT}"
 EOF
 
 echo ">>>> install-base.sh: Entering chroot and configuring system.."
-/usr/bin/arch-chroot ${TARGET_DIR} ${CONFIG_SCRIPT}
+/usr/bin/manjaro-chroot ${TARGET_DIR} ${CONFIG_SCRIPT}
 rm "${TARGET_DIR}${CONFIG_SCRIPT}"
 
 # http://comments.gmane.org/gmane.linux.arch.general/48739
