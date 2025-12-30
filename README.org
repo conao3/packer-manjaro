@@ -1,199 +1,112 @@
+#+title: packer-manjaro
 #+author: conao3
-#+date: <2020-03-20 Fri>
 
 [[https://github.com/conao3/packer-manjaro][https://raw.githubusercontent.com/conao3/files/master/blob/headers/png/packer-manjaro.png]]
+
 [[https://github.com/conao3/packer-manjaro/blob/master/LICENSE][https://img.shields.io/github/license/conao3/packer-manjaro.svg?style=flat-square]]
 [[https://github.com/conao3/packer-manjaro/releases][https://img.shields.io/github/tag/conao3/packer-manjaro.svg?style=flat-square]]
-[[https://github.com/conao3/packer-manjaro/actions][https://img.shields.io/badge/patreon-become%20a%20patron-orange.svg?logo=patreon&style=flat-square]]
-[[https://twitter.com/conao_3][https://img.shields.io/badge/twitter-@conao__3-blue.svg?logo=twitter&style=flat-square]]
-[[https://conao3-support.slack.com/join/shared_invite/enQtNjUzMDMxODcyMjE1LWUwMjhiNTU3Yjk3ODIwNzAxMTgwOTkxNmJiN2M4OTZkMWY0NjI4ZTg4MTVlNzcwNDY2ZjVjYmRiZmJjZDU4MDE][https://img.shields.io/badge/chat-on_slack-blue.svg?logo=slack&style=flat-square]]
 
-* Description
-Packer template for [[https://archlinux.org/][Arch Linux]] and [[https://manjaro.org/][Manjaro Linux]].
+* Overview
 
-This project is forked from [[https://github.com/elasticdog/packer-arch][packer-arch]] and added Manjaro Linux support.
+Packer templates for building [[https://archlinux.org/][Arch Linux]] and [[https://manjaro.org/][Manjaro Linux]] Vagrant base boxes.
+
+This project is forked from [[https://github.com/elasticdog/packer-arch][packer-arch]] and extends it with Manjaro Linux support.
+
+* Features
+
+- 64-bit system configuration
+- 20 GB disk allocation
+- 512 MB memory
+- Single root partition (ext4) without swap
+- Includes =base= meta package and =base-devel= group
+- OpenSSH installed and enabled on boot
+- Support for VirtualBox, VMware, Parallels, and libvirt providers
+
+* Requirements
+
+- [[https://www.packer.io/][Packer]]
+- [[https://www.vagrantup.com/][Vagrant]]
+- One of the following providers:
+  - [[https://www.virtualbox.org/][VirtualBox]]
+  - [[https://www.vmware.com/products/fusion/][VMware Fusion]] / [[https://www.vmware.com/products/workstation/][Workstation]]
+  - [[http://www.parallels.com/][Parallels]]
+  - [[https://github.com/vagrant-libvirt/vagrant-libvirt][libvirt]]
+
+** Quick Install (Arch/Manjaro)
+
+#+begin_src sh
+yay -S linux-headers virtualbox-host-dkms virtualbox vagrant packer
+#+end_src
 
 * Usage
+
+** Building a Box
+
 #+begin_src sh
+# Clone the repository
+git clone https://github.com/conao3/packer-manjaro.git
 cd packer-manjaro
+
+# Build for VirtualBox
 packer build -only=virtualbox-iso manjaro-template.json
 
-OUTPUT_VERSION=2021.02.01
+# Build for other providers
+packer build -only=vmware-iso manjaro-template.json
+packer build -only=parallels-iso manjaro-template.json
+packer build -only=qemu manjaro-template.json
+#+end_src
+
+** Importing into Vagrant
+
+#+begin_src sh
 VERSION=20210201
-vagrant box add archlinux-$VERSION output/packer_arch_virtualbox-$OUTPUT_VERSION.box
+vagrant box add manjaro-$VERSION output/packer_arch_virtualbox.box
+#+end_src
 
-cd ../
-# vagrant init archlinux-$VERSION
+** Starting the VM
+
+#+begin_src sh
 vagrant up
+vagrant ssh
+#+end_src
 
-# Now you can use vagranted Archlinux!
+** SSH Configuration
+
+#+begin_src sh
 vagrant ssh-config >> ~/.ssh/config
 ssh default
 #+end_src
 
-* Development
-** Requirements
-- [[https://www.vagrantup.com/][vagrant]] - 2.2.14
-  - [[https://www.virtualbox.org/][virtualbox]] - 6.1.16
-- [[https://www.packer.io/][packer]] - 1.6.5
+* Wrapper Script
 
-*** Quick install
+The =wrapacker= script automates the build process with additional options:
+
 #+begin_src sh
-# vagrant, packer
-yay -S linux-headers
-yay -S virtualbox-host-dkms
-yay -S virtualbox
-yay -S vagrant packer
+# Basic usage with country mirror
+wrapacker --country US
+
+# Debug mode
+PACKER_LOG=1 ./wrapacker --country=US --provider=virtualbox --on-error=ask --force
 #+end_src
 
-* Packer Arch - from [[https://github.com/elasticdog/packer-arch][packer-arch]] project page
+Run =wrapacker --help= for all available options.
 
-Packer Arch is a bare bones [[https://www.packer.io/][Packer]] template and installation
-script that can be used to generate a [[https://www.vagrantup.com/][Vagrant]] base box for [[https://www.archlinux.org/][Arch
-Linux]].  The template works with the default VirtualBox provider
-as well as with [[https://www.vagrantup.com/vmware][VMware]], [[https://github.com/Parallels/vagrant-parallels][Parallels]] and [[https://github.com/vagrant-libvirt/vagrant-libvirt][libvirt]] providers.
+* Known Issues
 
-** Overview
-My goal was to roughly duplicate the attributes from a
-[[https://www.digitalocean.com/][DigitalOcean]] Arch Linux droplet:
+** VMware Tools
 
-- 64-bit
-- 20 GB disk
-- 512 MB memory
-- Only a single /root partition (ext4)
-- No swap
-- Includes the =base= meta package and =base-devel= group
-- OpenSSH is also installed and enabled on boot
+VMware Tools do not officially support Arch Linux. The [[https://github.com/vmware/open-vm-tools][Open Virtual Machine Tools]] require patching for newer kernels. Shared folders will not work with VMware-based boxes.
 
-The installation script follows the [[https://wiki.archlinux.org/index.php/Installation_Guide][official installation guide]]
-pretty closely, with a few tweaks to ensure functionality within
-a VM.  Beyond that, the only customizations to the machine are
-related to the vagrant user and the steps recommended for any
-base box.
+VirtualBox guest additions work without issues.
 
-** Usage
-*** VirtualBox Provider
-Assuming that you already have Packer, [[https://www.virtualbox.org/][VirtualBox]], and Vagrant
-installed, you should be good to clone this repo and go:
+** Provisioners
 
-#+begin_example
-  $ git clone https://github.com/elasticdog/packer-arch.git
-  $ cd packer-arch/
-  $ packer build -only=virtualbox-iso arch-template.json
-#+end_example
+This box does not include Puppet, Chef, or Ansible. It provides a minimal base for testing configuration management tools like Ansible.
 
-Then you can import the generated box into Vagrant:
+* License
 
-#+begin_example
-  $ vagrant box add arch output/packer_arch_virtualbox.box
-#+end_example
+ISC License
 
-*** VMware Provider
-Assuming that you already have Packer, [[https://www.vmware.com/products/fusion/][VMware Fusion]] (or [[https://www.vmware.com/products/workstation/][VMware
-Workstation]]), and Vagrant with the VMware provider installed, you
-should be good to clone this repo and go:
+Copyright 2013-2017 [[mailto:aaron@elasticdog.com][Aaron Bull Schaefer]] (original packer-arch)
 
-#+begin_example
-  $ git clone https://github.com/elasticdog/packer-arch.git
-  $ cd packer-arch/
-  $ packer build -only=vmware-iso arch-template.json
-#+end_example
-
-Then you can import the generated box into Vagrant:
-
-#+begin_example
-  $ vagrant box add arch output/packer_arch_vmware.box
-#+end_example
-
-*** Parallels Provider
-Assuming that you already have Packer, [[http://www.parallels.com/][Parallels]], [[http://www.parallels.com/eu/products/desktop/download/][Parallels SDK]]
-and Vagrant with the Parallels provider installed, you should be
-good to clone this repo and go:
-
-#+begin_example
-  $ git clone https://github.com/elasticdog/packer-arch.git
-  $ cd packer-arch/
-  $ packer build -only=parallels-iso arch-template.json
-#+end_example
-
-Then you can import the generated box into Vagrant:
-
-#+begin_example
-  $ vagrant box add arch output/packer_arch_parallels.box
-#+end_example
-
-*** libvirt Provider
-Assuming that you already have Packer, Vagrant with the
-[[https://github.com/vagrant-libvirt/vagrant-libvirt][vagrant-libvirt]]
-plugin installed, you should be good to clone this repo and go:
-
-#+begin_example
-  $ git clone https://github.com/elasticdog/packer-arch.git
-  $ cd packer-arch/
-  $ packer build -only=qemu arch-template.json
-#+end_example
-
-Then you can import the generated box into Vagrant:
-
-#+begin_example
-  $ vagrant box add arch output/packer_arch_libvirt.box
-#+end_example
-
-NOTE: libvirt support is limited to QEMU/KVM only.
-
-*** wrapacker
-For convenience, there is a wrapper script named =wrapacker= that
-will run the appropriate =packer build= command for you that will
-also automatically ensure the latest ISO download URL and
-optionally use a mirror from a provided country code in order to
-build the final box.
-
-#+begin_example
-  $ wrapacker --country US --dry-run
-#+end_example
-
-For debugging purposes, execute:
-
-#+begin_example
-  $ PACKER_LOG=1 ./wrapacker --country=US --provider=virtualbox --on-error=ask --force
-#+end_example
-
-See the =--help= flag for additional details.
-
-** Known Issues
-*** VMware Tools
-The official VMware Tools do not currently support Arch Linux,
-and the [[https://github.com/vmware/open-vm-tools][Open Virtual Machine Tools]] (open-vm-tools) require
-extensive patching in order to compile correctly with a Linux
-3.11 series kernel.  So for the time being, I have not included
-support for the tools.
-
-No tools means that the shared folder feature will not work, and
-when you run =vagrant up= to launch a VM based on the VMware box,
-you will see the following error message:
-
-#+begin_quote
-  The HGFS kernel module was not found on the running virtual
-  machine.  This must be installed for shared folders to work
-  properly.  Please install the VMware tools within the guest and
-  try again.  Note that the VMware tools installation will
-  succeed even if HGFS fails to properly install.  Carefully read
-  the output of the VMware tools installation to verify the HGFS
-  kernel modules were installed properly.
-#+end_quote
-
-Note that /this issue does not apply to VirtualBox/, as their
-official guest additions work just fine.
-
-*** Vagrant Provisioners
-The box purposefully does not include Puppet, Chef or Ansible for
-automatic Vagrant provisioning.  My intention was to duplicate a
-DigitalOcean VPS and furthermore use the VM for testing [[http://www.ansible.com/][Ansible]]
-playbooks for configuration management.
-
-** License
-Packer Arch is provided under the terms of the [[https://en.wikipedia.org/wiki/ISC_license][ISC License]].
-
-Copyright © 2013--2017, [[mailto:aaron@elasticdog.com][Aaron Bull Schaefer]].
-
-Copyright © 2021, Naoya Yamashita.
+Copyright 2021 Naoya Yamashita
